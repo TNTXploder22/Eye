@@ -5,13 +5,12 @@ const app = express();
 // static files
 app.use('/client', express.static(path.resolve(__dirname + '/../client/')));
 
-// routes
-app.get('/server', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+//Page listeners (routers)
+var router = require('./router.js');
+router(app);
 
 // server
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/server`);
+    console.log(`Server running on http://localhost:${port}`);
 });
