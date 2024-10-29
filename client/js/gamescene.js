@@ -3,12 +3,15 @@ var platforms;
 var cursors;
 var orbs;
 var scoreText;
-var winspot;
+var winSpot;
+var isPaused = false;
+var pauseText;
+var pausebutton;
 
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'gamescene' });
-        this.score = 0;
+        this.score = 0; 
     }
 
     init() {
@@ -25,6 +28,8 @@ class GameScene extends Phaser.Scene {
         this.load.image('ground', 'client/assets/ground.png');
         this.load.image('platform1', 'client/assets/platform1.png');
         this.load.image('platform2', 'client/assets/platform2.png');
+        this.load.image('pause', 'client/assets/pausebutton.png');
+        this.load.image('winspot', 'client/assets/winspot.png')
         this.load.spritesheet('eye', 'client/assets/eye.png', { frameWidth: 88, frameHeight: 105 });
         console.log("Loading eye sprite sheet");
     }
@@ -45,14 +50,14 @@ class GameScene extends Phaser.Scene {
         platforms.create(200, 440, 'platform2');
         platforms.create(400, 350, 'platform2');
 
-        winspot = this.physics.add.image(600, 500, 'orb').setScale(2).setAlpha(0.5);
+        winSpot = this.physics.add.image(600, 512, 'winspot').setScale(1.5).setAlpha(0.5);
 
         player = this.physics.add.sprite(200, 450, 'eye').setScale(0.75);
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
 
         this.tweens.add({
-            targets: winspot,
+            targets: winSpot,
             alpha: 1,
             duration: 1000,
             ease: 'Sine.easeInOut',
@@ -75,12 +80,23 @@ class GameScene extends Phaser.Scene {
 
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(orbs, platforms);
-        this.physics.add.collider(winspot, platforms);
+        this.physics.add.collider(winSpot, platforms);
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
-        this.physics.add.overlap(player, winspot, this.winGame, null, this);
+        this.physics.add.overlap(player, winSpot, this.winGame, null, this);
+
+        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#fff' })
+            .setOrigin(0.5)
+            .setVisible(false);
+
+        this.input.keyboard.on('keydown-P', this.togglePause, this);
+
+        pausebutton = this.add.image(780, 20, 'pause').setScale(.05).setOrigin(0.5).setInteractive();
+        pausebutton.on('pointerdown', this.togglePause, this);
     }
 
     update() {
+        if (isPaused) return;
+
         if (cursors.left.isDown) {
             player.setVelocityX(-160);
             player.anims.play('left', true);
@@ -104,9 +120,20 @@ class GameScene extends Phaser.Scene {
     }
 
     winGame() {
-        winspot.disableBody(true, true);
+        winSpot.disableBody(true, true);
         console.log('Score before transitioning to win scene:', this.score); // Debugging log
         this.scene.start('winscene', { score: this.score });
+    }
+
+    togglePause() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            this.physics.pause();
+            pauseText.setVisible(true);
+        } else {
+            this.physics.resume();
+            pauseText.setVisible(false);
+        }
     }
 }
 
