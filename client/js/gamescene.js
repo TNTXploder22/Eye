@@ -2,15 +2,17 @@ var player;
 var platforms;
 var cursors;
 var orbs;
-var score = 0;
 var scoreText;
 var winspot;
 
 class GameScene extends Phaser.Scene {
     constructor() {
-        super({ 
-            key: 'gamescene'
-        });
+        super({ key: 'gamescene' });
+        this.score = 0;
+    }
+
+    init() {
+        this.score = 0;
     }
 
     preload() {
@@ -75,7 +77,6 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(orbs, platforms);
         this.physics.add.collider(winspot, platforms);
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
-
         this.physics.add.overlap(player, winspot, this.winGame, null, this);
     }
 
@@ -98,13 +99,14 @@ class GameScene extends Phaser.Scene {
 
     collectOrbs(player, orb) {
         orb.disableBody(true, true);
-        score += 1;
-        scoreText.setText('Orbs: ' + score);
+        this.score += 1;
+        scoreText.setText('Orbs: ' + this.score);
     }
 
     winGame() {
         winspot.disableBody(true, true);
-        this.scene.start('winscene');
+        console.log('Score before transitioning to win scene:', this.score); // Debugging log
+        this.scene.start('winscene', { score: this.score });
     }
 }
 
