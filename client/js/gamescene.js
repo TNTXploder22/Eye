@@ -18,22 +18,6 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
     }
 
-    preload() {
-        this.load.image('sky', 'client/assets/sky.png');
-        this.load.image('cloud1', 'client/assets/cloud1.png');
-        this.load.image('cloud2', 'client/assets/cloud2.png');
-        this.load.image('bush', 'client/assets/bush.png');
-        this.load.image('weed', 'client/assets/weed.png');
-        this.load.image('orb', 'client/assets/orb.png');
-        this.load.image('ground', 'client/assets/ground.png');
-        this.load.image('platform1', 'client/assets/platform1.png');
-        this.load.image('platform2', 'client/assets/platform2.png');
-        this.load.image('pause', 'client/assets/pausebutton.png');
-        this.load.image('winspot', 'client/assets/winspot.png')
-        this.load.spritesheet('eye', 'client/assets/eye.png', { frameWidth: 88, frameHeight: 105 });
-        console.log("Loading eye sprite sheet");
-    }
-
     create() {
         this.add.image(0, 0, 'sky').setOrigin(0, 0);
         this.add.image(200, 140, 'cloud1').setScale(7);
@@ -55,6 +39,7 @@ class GameScene extends Phaser.Scene {
         player = this.physics.add.sprite(200, 450, 'eye').setScale(0.75);
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
+        player.setSize(30, 100, 50, 0);
 
         this.tweens.add({
             targets: winSpot,

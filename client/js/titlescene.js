@@ -3,20 +3,6 @@ class TitleScene extends Phaser.Scene {
         super({ key: 'titlescene' });
     }
 
-    preload() {
-        this.load.image('sky', 'client/assets/sky.png');
-        this.load.image('cloud1', 'client/assets/cloud1.png');
-        this.load.image('cloud2', 'client/assets/cloud2.png');
-        this.load.image('bush', 'client/assets/bush.png');
-        this.load.image('weed', 'client/assets/weed.png');
-        this.load.image('orb', 'client/assets/orb.png');
-        this.load.image('ground', 'client/assets/ground.png');
-        this.load.image('shader', 'client/assets/cover.png');
-        this.load.image('eyetitle', 'client/assets/eyetitle.png');
-        this.load.image('playtitle', 'client/assets/playtitle.png');
-        this.load.image('arrowtitle', 'client/assets/arrowtitle.png');
-    }
-
     create() {
         this.add.image(0, 0, 'sky').setOrigin(0, 0);
         this.add.image(400, 600, 'ground').setScale(4);

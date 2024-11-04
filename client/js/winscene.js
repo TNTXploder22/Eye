@@ -3,13 +3,6 @@ class WinScene extends Phaser.Scene {
         super({ key: 'winscene' });
     }
 
-    preload() {
-        this.load.image('darkness', 'client/assets/darkness.png');
-        this.load.image('ctr', 'client/assets/ctr.png');
-        this.load.image('win', 'client/assets/win.png');
-        this.load.image('you', 'client/assets/you.png');
-    }
-
     init(data) {
         this.score = data.score || 0;
     }
@@ -17,9 +10,28 @@ class WinScene extends Phaser.Scene {
     create() {
         this.add.image(0, 0, 'darkness').setOrigin(0, 0);
         let ctr = this.add.image(400, 300, 'ctr').setOrigin(0.5).setAlpha(0.5);
-        this.add.image(0, 0, 'you').setOrigin(0, 0);
-        this.add.image(0, 0, 'win').setOrigin(0, 0);
+        this.add.image(-110, 0, 'you').setOrigin(0, 0).setScale(.75);
+        this.add.image(300, -100, 'win').setOrigin(0, 0).setScale(.75);
         this.add.text(400, 400, 'Orbs Collected: ' + this.score, { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
+
+        const goldCircle = this.add.image(500, 230, 'gold').setOrigin(0, 0).setAlpha(0.5).setScale(3);
+        const silverCircle = this.add.image(350, 230, 'silver').setOrigin(0, 0).setAlpha(0.5).setScale(3);
+        const bronzeCircle = this.add.image(200, 230, 'bronze').setOrigin(0, 0).setAlpha(0.5).setScale(3);
+
+        goldCircle.setTint(0x4f4f4f);
+        silverCircle.setTint(0x4f4f4f);
+        bronzeCircle.setTint(0x4f4f4f);
+
+        if (this.score >= 12) {
+            goldCircle.clearTint();
+            bronzeCircle.clearTint();
+            silverCircle.clearTint();
+        } else if (this.score >= 6) {
+            bronzeCircle.clearTint();
+            silverCircle.clearTint();
+        } else if (this.score >= 0) {
+            bronzeCircle.clearTint();
+        }
 
         this.tweens.add({
             targets: ctr,

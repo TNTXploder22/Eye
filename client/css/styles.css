@@ -1,0 +1,101 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/A_black_image.jpg/640px-A_black_image.jpg'); /* Replace with your image URL */
+    background-size: cover; /* Ensures the image covers the entire viewport */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1); /* Slight white fade */
+    border: 2px solid white; /* White outline */
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 350px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #ffffff; /* Change text color to white for better contrast */
+    font-size: 24px;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #ffffff; /* Change text color to white */
+    font-family: 'Comic Sans MS', cursive;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid white; /* White border for inputs */
+    background: transparent; /* Make input background transparent */
+    color: #ffffff; /* Change text color to white */
+    border-radius: 20px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #ffffff; /* Keep focus border white */
+    outline: none;
+}
+
+button {
+    background-color: transparent; /* Make button background transparent */
+    color: white; /* Text color remains white */
+    border: 2px solid white; /* White outline for button */
+    padding: 12px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly light background on hover */
+    transform: scale(1.05);
+}
+
+p {
+    margin-top: 20px;
+    color: #ffffff; /* Change text color to white */
+    font-family: 'Comic Sans MS', cursive;
+}
+
+a {
+    color: #73e7fb; /* Link color */
+    text-decoration: none;
+    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+a:hover {
+    text-decoration: underline;
+}
