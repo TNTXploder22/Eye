@@ -1,4 +1,3 @@
-// game.js
 import GameScene from './gamescene.js';
 import TitleScene from './titlescene.js';
 import WinScene from './winscene.js';
@@ -23,6 +22,6 @@ export default class Game {
             },
         };
 
-        this.game = new Phaser.Game(config); // Store the Phaser.Game instance
+        this.game = new Phaser.Game(config);
     }
 }

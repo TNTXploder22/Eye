@@ -24,7 +24,7 @@
             <p>Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></p>
         </div>
 
-        <div id="signup-section" style="display: none;"> <!-- Hidden initially -->
+        <div id="signup-section" style="display: none;">
             <h1>Sign Up</h1>
             <form id="signup-form" onsubmit="return signUp(event)">
                 <label for="signup-username">Username</label>
@@ -42,12 +42,11 @@
         </div>
     </div>
 
-    <div id="game-container" style="display: none;"> <!-- Hidden initially -->
-        <!-- The Phaser game will be initialized here -->
+    <div id="game-container" style="display: none;"> 
     </div>
 
     <script>
-        let game; // Declare the game variable at the top
+        let game;
 
         function showSignUp() {
             document.getElementById('signin-section').style.display = 'none';
@@ -73,14 +72,13 @@
             });
 
             if (response.ok) {
-                document.querySelector('.container').style.display = 'none'; // Hide the forms
-                document.getElementById('game-container').style.display = 'block'; // Show the game container
+                document.querySelector('.container').style.display = 'none';
+                document.getElementById('game-container').style.display = 'block';
                 
-                // Initialize the game
                 startGame();
             } else {
                 const errorData = await response.json();
-                alert(errorData.msg); // Show error message
+                alert(errorData.msg);
             }
         }
 
@@ -100,18 +98,17 @@
 
             if (response.ok) {
                 alert('Sign-up successful! You can now sign in.');
-                showSignIn(); // Switch back to the sign-in form
+                showSignIn();
             } else {
                 const errorData = await response.json();
-                alert(errorData.msg); // Show error message
+                alert(errorData.msg);
             }
         }
 
         function startGame() {
             import('../client/js/game.js').then(module => {
-                // Use `default` to access the exported class
-                game = new module.default(); // Assuming your game.js exports a default class Game
-                document.getElementById('game-container').appendChild(game.game.canvas); // Append the canvas to the game container
+                game = new module.default();
+                document.getElementById('game-container').appendChild(game.game.canvas);
             }).catch(err => {
                 console.error('Failed to load game module:', err);
             });
