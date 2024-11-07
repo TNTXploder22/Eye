@@ -8,7 +8,6 @@ class WinScene extends Phaser.Scene {
     }
 
     create() {
-        //this.add.image(0, 0, 'darkness').setOrigin(0, 0);
         let ctr = this.add.image(400, 300, 'ctr').setOrigin(0.5).setAlpha(0.5);
         this.add.image(-110, 0, 'you').setOrigin(0, 0).setScale(.75);
         this.add.image(300, -100, 'win').setOrigin(0, 0).setScale(.75);
