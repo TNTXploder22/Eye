@@ -76,7 +76,6 @@
             if (response.ok) {
                 document.querySelector('.container').style.display = 'none';
                 document.getElementById('game-container').style.display = 'block';
-                
                 startGame();
             } else {
                 const errorData = await response.json();
@@ -100,7 +99,7 @@
 
             if (response.ok) {
                 alert('Sign-up successful! You can now sign in.');
-                showSignIn();
+                showSignIn(event);
             } else {
                 const errorData = await response.json();
                 alert(errorData.msg);
