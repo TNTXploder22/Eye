@@ -21,7 +21,7 @@
 
                 <button type="submit">Sign In</button>
             </form>
-            <p>Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></p>
+            <p>Don't have an account? <a href="javascript:void(0)" onclick="showSignUp(event)">Sign Up</a></p>
         </div>
 
         <div id="signup-section" style="display: none;">
@@ -38,7 +38,7 @@
 
                 <button type="submit">Sign Up</button>
             </form>
-            <p>Already have an account? <a href="#" onclick="showSignIn()">Sign In</a></p>
+            <p>Already have an account? <a href="javascript:void(0)" onclick="showSignIn(event)">Sign In</a></p>
         </div>
     </div>
 
@@ -48,12 +48,14 @@
     <script>
         let game;
 
-        function showSignUp() {
+        function showSignUp(event) {
+            event.preventDefault();
             document.getElementById('signin-section').style.display = 'none';
             document.getElementById('signup-section').style.display = 'block';
         }
 
-        function showSignIn() {
+        function showSignIn(event) {
+            event.preventDefault();
             document.getElementById('signup-section').style.display = 'none';
             document.getElementById('signin-section').style.display = 'block';
         }

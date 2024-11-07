@@ -8,15 +8,15 @@ class WinScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.image(0, 0, 'darkness').setOrigin(0, 0);
+        //this.add.image(0, 0, 'darkness').setOrigin(0, 0);
         let ctr = this.add.image(400, 300, 'ctr').setOrigin(0.5).setAlpha(0.5);
         this.add.image(-110, 0, 'you').setOrigin(0, 0).setScale(.75);
         this.add.image(300, -100, 'win').setOrigin(0, 0).setScale(.75);
         this.add.text(400, 400, 'Orbs Collected: ' + this.score, { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
 
-        const goldCircle = this.add.image(500, 230, 'gold').setOrigin(0, 0).setAlpha(0.5).setScale(3);
-        const silverCircle = this.add.image(350, 230, 'silver').setOrigin(0, 0).setAlpha(0.5).setScale(3);
-        const bronzeCircle = this.add.image(200, 230, 'bronze').setOrigin(0, 0).setAlpha(0.5).setScale(3);
+        const goldCircle = this.add.image(500, 230, 'gold').setOrigin(0, 0).setScale(3);
+        const silverCircle = this.add.image(350, 230, 'silver').setOrigin(0, 0).setScale(3);
+        const bronzeCircle = this.add.image(200, 230, 'bronze').setOrigin(0, 0).setScale(3);
 
         goldCircle.setTint(0x4f4f4f);
         silverCircle.setTint(0x4f4f4f);

@@ -61,7 +61,7 @@ class GameScene extends Phaser.Scene {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
-        scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#7f7ff5' });
+        scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' });
 
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(orbs, platforms);
@@ -69,7 +69,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
         this.physics.add.overlap(player, winSpot, this.winGame, null, this);
 
-        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#fff' })
+        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#FF0000' })
             .setOrigin(0.5)
             .setVisible(false);
 
