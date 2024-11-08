@@ -74,6 +74,11 @@
             });
 
             if (response.ok) {
+                const data = await response.json();
+                const { username, email, gameItems } = data.user;
+
+                window.userData = { username, email, ...gameItems };
+
                 document.querySelector('.container').style.display = 'none';
                 document.getElementById('game-container').style.display = 'block';
                 startGame();
@@ -109,6 +114,7 @@
         function startGame() {
             import('../client/js/game.js').then(module => {
                 game = new module.default();
+                game.userData = window.userData;
                 document.getElementById('game-container').appendChild(game.game.canvas);
             }).catch(err => {
                 console.error('Failed to load game module:', err);

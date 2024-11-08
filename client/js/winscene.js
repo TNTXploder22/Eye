@@ -4,6 +4,7 @@ class WinScene extends Phaser.Scene {
     }
 
     init(data) {
+        // Initializing the score (orbs collected during the game).
         this.score = data.score || 0;
     }
 
@@ -21,6 +22,7 @@ class WinScene extends Phaser.Scene {
         silverCircle.setTint(0x4f4f4f);
         bronzeCircle.setTint(0x4f4f4f);
 
+        // Rank calculation based on score
         if (this.score >= 12) {
             goldCircle.clearTint();
             bronzeCircle.clearTint();
@@ -41,9 +43,48 @@ class WinScene extends Phaser.Scene {
             repeat: -1
         });
 
+        // When player clicks, send data and move to the next scene
         this.input.on('pointerdown', () => {
+            this.updatePlayerData();
             this.scene.start('gamescene');
         });
+    }
+
+    async updatePlayerData() {
+        // Fetching the username from global user data
+        const username = window.userData.username;
+
+        // Calculate rankOrbs based on the score
+        let rankOrbs = 0;
+        if (this.score >= 12) {
+            rankOrbs = 3; // Gold, Silver, Bronze
+        } else if (this.score >= 6) {
+            rankOrbs = 2; // Silver, Bronze
+        } else if (this.score >= 0) {
+            rankOrbs = 1; // Bronze only
+        }
+
+        // Send the updated data to the backend
+        const response = await fetch('/update-game-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                score: this.score,  // Send score (orbs)
+                orbs: this.score,  // Send orbs
+                rankOrbs: rankOrbs,  // Send rankOrbs based on score
+                lives: window.userData.lives
+            })
+        });
+
+        if (response.ok) {
+            console.log('Game data updated successfully!');
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to update game data:', errorData.msg);
+        }
     }
 }
 
