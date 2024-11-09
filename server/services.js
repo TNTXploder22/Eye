@@ -4,26 +4,24 @@ const bcrypt = require('bcrypt');
 
 const DBNAME = 'eye';
 const dbURL = 'mongodb://127.0.0.1';
-const client = new MongoClient(dbURL, { useUnifiedTopology: true, poolSize: 10 }); // Explicit connection pooling
-const sr = 8; // Reduced Salt rounds for bcrypt hashing
+const client = new MongoClient(dbURL, { maxPoolSize: 10 });
+const sr = 8;
 
-// Reuse the connection instead of reconnecting on every request
 let dbConnection;
 
 async function connectDB() {
-    if (dbConnection) return dbConnection; // Reuse connection if already established
+    if (dbConnection) return dbConnection;
     await client.connect();
     const db = client.db(DBNAME);
-    dbConnection = db; // Store the db connection
+    dbConnection = db;
     const coll = db.collection('player');
-    await coll.createIndex({ username: 1 }, { unique: true }); // Ensure index on username
+    await coll.createIndex({ username: 1 }, { unique: true });
     return dbConnection;
 }
 
 var services = function(app) {
     app.use(express.json());
 
-    // POST route to create a new user
     app.post('/write-data', async function(req, res) {
         const { username, password, email, rankOrbs = 0, megaOrbs = 0, orbs = 0, lives = 3 } = req.body;
 
@@ -33,7 +31,7 @@ var services = function(app) {
 
         const data = {
             username,
-            password: await bcrypt.hash(password, sr), // Use reduced salt rounds
+            password: await bcrypt.hash(password, sr),
             email,
             gameItems: { rankOrbs, megaOrbs, orbs, lives }
         };
@@ -51,9 +49,8 @@ var services = function(app) {
         }
     });
 
-    // GET route to fetch user data (only necessary fields)
     app.get('/get-user-data', async (req, res) => {
-        const { username } = req.query;  // Retrieve username from query params
+        const { username } = req.query;
 
         if (!username) {
             return res.status(400).send({ success: false, message: "Missing username" });
@@ -68,13 +65,12 @@ var services = function(app) {
                 return res.status(404).send({ success: false, message: "User not found" });
             }
 
-            return res.status(200).json(user);  // Send back user data with only required fields
+            return res.status(200).json(user);
         } catch (err) {
             return res.status(500).send({ success: false, message: "Error: " + err.message });
         }
     });
 
-    // POST route to update game data (updates orbs and rankOrbs)
     app.post('/update-game-data', async (req, res) => {
         const { username, orbs, score, rankOrbs, lives } = req.body;
 
@@ -91,20 +87,23 @@ var services = function(app) {
                 return res.status(400).send({ success: false, message: "User not found" });
             }
 
-            // Add the current orbs to the existing orbs without overwriting
-            const newOrbs = user.gameItems.orbs + orbs;
+            let newOrbs = user.gameItems.orbs + orbs;
+            let newLives = user.gameItems.lives;
 
-            // Update rankOrbs only if the new value is higher than the current stored value
+            while (newOrbs >= 100) {
+                newOrbs -= 100;
+                newLives += 1;
+            }
+
             let newRankOrbs = user.gameItems.rankOrbs;
             if (rankOrbs > newRankOrbs) {
                 newRankOrbs = rankOrbs;
             }
 
-            // Prepare the updated player data
             const playerData = {
                 'gameItems.orbs': newOrbs,
                 'gameItems.rankOrbs': newRankOrbs,
-                'gameItems.lives': lives || user.gameItems.lives,
+                'gameItems.lives': newLives,
             };
 
             const result = await coll.updateOne(
@@ -122,9 +121,7 @@ var services = function(app) {
         }
     });
 
-    // POST route for signing in (with bcrypt optimization)
     app.post('/signin', async (req, res) => {
-        console.log("Signin route called"); // Add logging here
         const { username, password } = req.body;
 
         if (!username || !password) {
