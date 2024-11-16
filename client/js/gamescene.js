@@ -9,7 +9,7 @@ var pauseText;
 var pausebutton;
 var livesText;
 var livesIcon;
-var playerLives = 3;  // Default lives if no data is fetched initially
+var playerLives = 3;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -20,13 +20,12 @@ class GameScene extends Phaser.Scene {
     async init() {
         this.score = 0;
 
-        // Fetch player data (lives) from the database
         try {
-            const username = window.userData.username; // Get the username from window.userData (set at login)
-            const response = await fetch(`/get-user-data?username=${username}`); // Fetch user data
+            const username = window.userData.username;
+            const response = await fetch(`/get-user-data?username=${username}`);
             if (response.ok) {
                 const data = await response.json();
-                playerLives = data.gameItems.lives;  // Set player lives from DB
+                playerLives = data.gameItems.lives;
             } else {
                 console.error('Failed to fetch player data');
             }
@@ -80,9 +79,21 @@ class GameScene extends Phaser.Scene {
 
         scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' });
 
-        // Add the "Lives" image and text
         livesIcon = this.add.image(30, 65, 'clife').setScale(.75).setOrigin(0.5);
         livesText = this.add.text(50, 50, `Lives: ${playerLives}`, { fontSize: '32px', fill: '#FF0000' });
+
+        livesIcon.setScrollFactor(0);
+        livesText.setScrollFactor(0);
+        scoreText.setScrollFactor(0);
+
+        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#FF0000' })
+            .setOrigin(0.5)
+            .setVisible(false);
+        pauseText.setScrollFactor(0);
+
+        pausebutton = this.add.image(780, 20, 'pause').setScale(.05).setOrigin(0.5).setInteractive();
+        pausebutton.on('pointerdown', this.togglePause, this);
+        pausebutton.setScrollFactor(0);
 
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(orbs, platforms);
@@ -90,14 +101,11 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
         this.physics.add.overlap(player, winSpot, this.winGame, null, this);
 
-        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#FF0000' })
-            .setOrigin(0.5)
-            .setVisible(false);
+        this.cameras.main.startFollow(player);
+        this.cameras.main.setBounds(0, 0, 1600, 600);
+        this.cameras.main.setLerp(0.1, 0.1);
 
         this.input.keyboard.on('keydown-P', this.togglePause, this);
-
-        pausebutton = this.add.image(780, 20, 'pause').setScale(.05).setOrigin(0.5).setInteractive();
-        pausebutton.on('pointerdown', this.togglePause, this);
     }
 
     update() {
@@ -118,7 +126,6 @@ class GameScene extends Phaser.Scene {
             player.setVelocityY(-330);
         }
 
-        // Update the lives display in real-time if the value changes
         livesText.setText(`Lives: ${playerLives}`);
     }
 
@@ -130,7 +137,7 @@ class GameScene extends Phaser.Scene {
 
     winGame() {
         winSpot.disableBody(true, true);
-        console.log('Score before transitioning to win scene:', this.score); // Debugging log
+        console.log('Score before transitioning to win scene:', this.score);
         this.updatePlayerData();
         this.scene.start('winscene', { score: this.score });
     }
@@ -158,7 +165,6 @@ class GameScene extends Phaser.Scene {
             rankOrbs = 1;
         }
 
-        // Update player data, including lives
         const response = await fetch('/update-game-data', {
             method: 'POST',
             headers: {
@@ -166,7 +172,7 @@ class GameScene extends Phaser.Scene {
             },
             body: JSON.stringify({
                 username,
-                orbs: this.score,   // Assuming you want to update orbs with score
+                orbs: this.score,
                 score: this.score,
                 rankOrbs: rankOrbs,
                 lives: playerLives
