@@ -42,43 +42,8 @@ class WinScene extends Phaser.Scene {
         });
 
         this.input.on('pointerdown', () => {
-            this.updatePlayerData();
             this.scene.start('gamescene');
         });
-    }
-
-    async updatePlayerData() {
-        const username = window.userData.username;
-
-        let rankOrbs = 0;
-        if (this.score >= 12) {
-            rankOrbs = 3;
-        } else if (this.score >= 6) {
-            rankOrbs = 2;
-        } else if (this.score >= 0) {
-            rankOrbs = 1;
-        }
-
-        const response = await fetch('/update-game-data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username,
-                score: this.score,
-                orbs: this.score,
-                rankOrbs: rankOrbs,
-                lives: window.userData.lives
-            })
-        });
-
-        if (response.ok) {
-            console.log('Game data updated successfully!');
-        } else {
-            const errorData = await response.json();
-            console.error('Failed to update game data:', errorData.msg);
-        }
     }
 }
 
