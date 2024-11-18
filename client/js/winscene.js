@@ -21,11 +21,11 @@ class WinScene extends Phaser.Scene {
         silverCircle.setTint(0x4f4f4f);
         bronzeCircle.setTint(0x4f4f4f);
 
-        if (this.score >= 12) {
+        if (this.score >= 25) {
             goldCircle.clearTint();
             bronzeCircle.clearTint();
             silverCircle.clearTint();
-        } else if (this.score >= 6) {
+        } else if (this.score >= 12) {
             bronzeCircle.clearTint();
             silverCircle.clearTint();
         } else if (this.score >= 0) {

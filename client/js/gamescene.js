@@ -36,21 +36,49 @@ class GameScene extends Phaser.Scene {
 
     create() {
         this.add.image(0, 0, 'sky').setOrigin(0, 0);
+        this.add.image(800, 0, 'sky').setOrigin(0, 0);
+        this.add.image(1200, 0, 'sky').setOrigin(0, 0);
+        this.add.image(1600, 0, 'sky').setOrigin(0, 0);
+        this.add.image(2000, 0, 'sky').setOrigin(0, 0);
         this.add.image(200, 140, 'cloud1').setScale(7);
         this.add.image(600, 200, 'cloud2').setScale(7);
+        this.add.image(1000, 140, 'cloud2').setScale(7);
+        this.add.image(1400, 140, 'cloud1').setScale(7);
+        this.add.image(1800, 200, 'cloud2').setScale(7);
+        this.add.image(2200, 140, 'cloud1').setScale(7);
         this.add.image(600, 520, 'bush').setScale(3);
         this.add.image(300, 520, 'bush').setScale(3);
+        this.add.image(2000, 520, 'bush').setScale(3);
+        this.add.image(2300, 195, 'bush').setScale(3);
+        this.add.image(1200, 295, 'bush').setScale(3);
         this.add.image(600, 200, 'weed').setScale(2);
         this.add.image(500, 525, 'weed').setScale(2);
         this.add.image(100, 525, 'weed').setScale(2);
+        this.add.image(900, 525, 'weed').setScale(2);
+        this.add.image(1100, 525, 'weed').setScale(2);
+        this.add.image(100, 525, 'weed').setScale(2);
+        this.add.image(1800, 525, 'weed').setScale(2);
+        this.add.image(1000, 390, 'weed').setScale(2);
+        this.add.image(1800, 200, 'weed').setScale(2);
+        this.add.image(1400, 500, 'weed').setScale(2);
 
         platforms = this.physics.add.staticGroup();
         platforms.create(400, 600, 'ground').setScale(1).refreshBody();
+        platforms.create(800, 600, 'ground').setScale(1).refreshBody();
+        platforms.create(2000, 600, 'ground').setScale(1).refreshBody();
         platforms.create(600, 250, 'platform1');
         platforms.create(200, 440, 'platform2');
         platforms.create(400, 350, 'platform2');
+        platforms.create(1200, 350, 'platform1');
+        platforms.create(1000, 440, 'platform2');
+        platforms.create(2300, 250, 'platform1');
+        platforms.create(2000, 450, 'platform1');
+        platforms.create(1500, 300, 'platform1');
+        platforms.create(2100, 150, 'platform2');
+        platforms.create(1800, 250, 'platform2');
+        platforms.create(1400, 550, 'platform2');
 
-        winSpot = this.physics.add.image(600, 512, 'winspot').setScale(1.5).setAlpha(0.5);
+        winSpot = this.physics.add.image(2300, 512, 'winspot').setScale(1.5).setAlpha(0.5);
 
         player = this.physics.add.sprite(200, 450, 'eye').setScale(0.75);
         player.setBounce(0.2);
@@ -72,16 +100,14 @@ class GameScene extends Phaser.Scene {
 
         cursors = this.input.keyboard.createCursorKeys();
 
-        orbs = this.physics.add.group({ key: 'orb', repeat: 11, setXY: { x: 12, y: 0, stepX: 70 } });
+        orbs = this.physics.add.group({ key: 'orb', repeat: 24, setXY: { x: 50, y: 0, stepX: 95 } });
         orbs.children.iterate(function (child) {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
         scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' });
-
         livesIcon = this.add.image(30, 65, 'clife').setScale(.75).setOrigin(0.5);
         livesText = this.add.text(50, 50, `Lives: ${playerLives}`, { fontSize: '32px', fill: '#FF0000' });
-
         livesIcon.setScrollFactor(0);
         livesText.setScrollFactor(0);
         scoreText.setScrollFactor(0);
@@ -102,10 +128,12 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(player, winSpot, this.winGame, null, this);
 
         this.cameras.main.startFollow(player);
-        this.cameras.main.setBounds(0, 0, 1600, 600);
+        this.cameras.main.setBounds(0, 0, 2400, 600);
         this.cameras.main.setLerp(0.1, 0.1);
 
         this.input.keyboard.on('keydown-P', this.togglePause, this);
+
+        this.physics.world.setBounds(0, 0, 2400, 600);
     }
 
     update() {
@@ -157,9 +185,9 @@ class GameScene extends Phaser.Scene {
         const username = window.userData.username;
 
         let rankOrbs = 0;
-        if (this.score >= 12) {
+        if (this.score >= 25) {
             rankOrbs = 3;
-        } else if (this.score >= 6) {
+        } else if (this.score >= 12) {
             rankOrbs = 2;
         } else if (this.score >= 0) {
             rankOrbs = 1;
