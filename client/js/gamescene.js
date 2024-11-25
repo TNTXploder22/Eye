@@ -10,6 +10,9 @@ var pausebutton;
 var livesText;
 var livesIcon;
 var playerLives = 3;
+var lastCheckpoint = null;
+var checkpoint;
+var killBrick;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -21,7 +24,12 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
 
         try {
-            const username = window.userData.username;
+            const username = window.userData?.username;
+            if (!username) {
+                console.error('Username is not defined');
+                return;
+            }
+
             const response = await fetch(`/get-user-data?username=${username}`);
             if (response.ok) {
                 const data = await response.json();
@@ -120,12 +128,20 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
         this.physics.add.overlap(player, winSpot, this.winGame, null, this);
 
+        checkpoint = this.physics.add.staticImage(100, 100, 'checkpoint');
+        checkpoint.setSize(50, 50);
+
+        killBrick = this.physics.add.staticImage(1600, 500, 'killbrick').setScale(0.5).setInteractive();
+        this.physics.world.enable(killBrick);
+
+        this.physics.add.overlap(player, checkpoint, this.saveCheckpoint, null, this);
+        this.physics.add.overlap(player, killBrick, this.updatePlayerLives, null, this);
+
         this.cameras.main.startFollow(player);
         this.cameras.main.setBounds(0, 0, 2400, 600);
         this.cameras.main.setLerp(0.1, 0.1);
 
         this.input.keyboard.on('keydown-P', this.togglePause, this);
-
         this.physics.world.setBounds(0, 0, 2400, 600);
     }
 
@@ -174,8 +190,38 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    saveCheckpoint(player, checkpoint) {
+        lastCheckpoint = { x: player.x, y: player.y };
+        console.log('Checkpoint saved at:', lastCheckpoint);
+    }
+
+    async updatePlayerLives() {
+        console.log('before player dies: ' + playerLives);
+        playerLives -= 1;
+        console.log('after player dies: ' + playerLives);
+        console.log('Last checkpoint:', lastCheckpoint);
+
+        if (playerLives <= 0) {
+            await this.updatePlayerData();
+            this.scene.start('deathscene');
+        } else {
+            if (lastCheckpoint) {
+                player.setPosition(lastCheckpoint.x, lastCheckpoint.y);
+                console.log('Respawned at checkpoint:', lastCheckpoint);
+            } else {
+                player.setPosition(200, 450);
+                console.log('Respawned at starting position');
+            }
+            await this.updatePlayerData();
+        }
+    }
+
     async updatePlayerData() {
-        const username = window.userData.username;
+        const username = window.userData?.username;
+        if (!username) {
+            console.error('Username is not defined');
+            return;
+        }
 
         let rankOrbs = 0;
         if (this.score >= 25) {
@@ -186,7 +232,20 @@ class GameScene extends Phaser.Scene {
             rankOrbs = 1;
         }
 
-        const response = await fetch('/update-game-data', {
+        if (this.score === undefined || playerLives === undefined || rankOrbs === undefined) {
+            console.error('Invalid data:', { score: this.score, playerLives, rankOrbs });
+            return;
+        }
+
+        console.log('Sending update request with:', {
+            username,
+            orbs: this.score,
+            score: this.score,
+            rankOrbs: rankOrbs,
+            lives: playerLives
+        });
+
+        const updateResponse = await fetch('/update-game-data', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -200,11 +259,11 @@ class GameScene extends Phaser.Scene {
             })
         });
 
-        if (response.ok) {
+        if (updateResponse.ok) {
             console.log('Game data updated successfully!');
         } else {
-            const errorData = await response.json();
-            console.error('Failed to update game data:', errorData.msg);
+            const errorData = await updateResponse.json();
+            console.error('Failed to update game data:', errorData);
         }
     }
 }

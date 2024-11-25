@@ -74,7 +74,7 @@ var services = function(app) {
     app.post('/update-game-data', async (req, res) => {
         const { username, orbs, score, rankOrbs, lives } = req.body;
 
-        if (!username || orbs === undefined || score === undefined || rankOrbs === undefined) {
+        if (!username || orbs === undefined || score === undefined || rankOrbs === undefined || lives === undefined) {
             return res.status(400).send({ success: false, message: "Missing required fields" });
         }
 
@@ -87,17 +87,17 @@ var services = function(app) {
                 return res.status(400).send({ success: false, message: "User not found" });
             }
 
-            let newOrbs = user.gameItems.orbs + orbs;
-            let newLives = user.gameItems.lives;
+            while (orbs < 0) {
+                newLives -= 1;
+            }
+            
+            if (rankOrbs > newRankOrbs) {
+                newRankOrbs = rankOrbs;
+            }
 
             while (newOrbs >= 100) {
                 newOrbs -= 100;
                 newLives += 1;
-            }
-
-            let newRankOrbs = user.gameItems.rankOrbs;
-            if (rankOrbs > newRankOrbs) {
-                newRankOrbs = rankOrbs;
             }
 
             const playerData = {
@@ -110,10 +110,6 @@ var services = function(app) {
                 { username },
                 { $set: playerData }
             );
-
-            if (result.modifiedCount === 0) {
-                return res.status(400).send({ success: false, message: "No changes were made" });
-            }
 
             return res.status(200).send({ success: true, message: "Game data updated successfully!" });
         } catch (err) {

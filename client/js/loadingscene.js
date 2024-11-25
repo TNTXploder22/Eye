@@ -30,6 +30,8 @@ class LoadingScene extends Phaser.Scene {
             { type: 'image', key: 'playtitle', path: 'client/assets/cplaytitle.png' },
             { type: 'image', key: 'arrowtitle', path: 'client/assets/carrowtitle.png' },
             { type: 'image', key: 'clife', path: 'client/assets/clife.png' },
+            { type: 'image', key: 'ccheckpoint', path: 'client/assets/ccheckpoint.png' },
+            { type: 'image', key: 'death', path: 'client/assets/death.png' },
             { type: 'spritesheet', key: 'eye', path: 'client/assets/eye.png', frameWidth: 88, frameHeight: 105 }
         ];
 
