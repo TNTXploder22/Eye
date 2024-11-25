@@ -105,21 +105,14 @@ class GameScene extends Phaser.Scene {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
-        scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' });
-        livesIcon = this.add.image(30, 65, 'clife').setScale(.75).setOrigin(0.5);
-        livesText = this.add.text(50, 50, `Lives: ${playerLives}`, { fontSize: '32px', fill: '#FF0000' });
-        livesIcon.setScrollFactor(0);
-        livesText.setScrollFactor(0);
-        scoreText.setScrollFactor(0);
+        scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' }).setScrollFactor(0);
+        livesIcon = this.add.image(30, 65, 'clife').setScale(.75).setOrigin(0.5).setScrollFactor(0);
+        livesText = this.add.text(50, 50, `Lives: ${playerLives}`, { fontSize: '32px', fill: '#FF0000' }).setScrollFactor(0);
 
-        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#FF0000' })
-            .setOrigin(0.5)
-            .setVisible(false);
-        pauseText.setScrollFactor(0);
+        pauseText = this.add.text(400, 300, 'Paused', { fontSize: '64px', fill: '#FF0000' }).setOrigin(0.5).setVisible(false).setScrollFactor(0);
 
-        pausebutton = this.add.image(780, 20, 'pause').setScale(.05).setOrigin(0.5).setInteractive();
+        pausebutton = this.add.image(780, 20, 'pause').setScale(.05).setOrigin(0.5).setInteractive().setScrollFactor(0);
         pausebutton.on('pointerdown', this.togglePause, this);
-        pausebutton.setScrollFactor(0);
 
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(orbs, platforms);

@@ -2,6 +2,7 @@ import GameScene from './gamescene.js';
 import TitleScene from './titlescene.js';
 import WinScene from './winscene.js';
 import LoadingScene from './loadingscene.js';
+import DeathScene from './deathscene.js';
 
 export default class Game {
     constructor() {
@@ -9,7 +10,7 @@ export default class Game {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            scene: [LoadingScene, TitleScene, GameScene, WinScene],
+            scene: [LoadingScene, TitleScene, GameScene, WinScene, DeathScene],
             physics: {
                 default: 'arcade',
                 arcade: {
