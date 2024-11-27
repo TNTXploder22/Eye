@@ -245,7 +245,6 @@ class GameScene extends Phaser.Scene {
         console.log('Sending update request with:', {
             username,
             orbs: this.score,
-            score: this.score,
             rankOrbs: rankOrbs,
             lives: playerLives
         });
@@ -258,7 +257,6 @@ class GameScene extends Phaser.Scene {
             body: JSON.stringify({
                 username: username,
                 orbs: this.score,
-                score: this.score,
                 rankOrbs: rankOrbs,
                 lives: playerLives
             })

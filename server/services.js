@@ -72,9 +72,9 @@ var services = function(app) {
     });
 
     app.post('/update-game-data', async (req, res) => {
-        const { username, orbs, score, rankOrbs, lives } = req.body;
+        const { username, orbs, rankOrbs, lives } = req.body;
 
-        if (!username || orbs === undefined || score === undefined || rankOrbs === undefined || lives === undefined) {
+        if (!username || orbs === undefined || rankOrbs === undefined || lives === undefined) {
             return res.status(400).send({ success: false, message: "Missing required fields" });
         }
 
