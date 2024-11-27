@@ -78,17 +78,19 @@ var services = function(app) {
             return res.status(400).send({ success: false, message: "Missing required fields" });
         }
 
+        console.log('banana')
+
         try {
             const db = await connectDB();
             const coll = db.collection('player');
-            const user = await coll.findOne({ username });
+            const user = await coll.findOne({ username: username });
+
+            var newOrbs = orbs + user.gameItems.orbs;
+            var newRankOrbs = user.gameItems.rankOrbs;
+            var newLives = lives;
 
             if (!user) {
                 return res.status(400).send({ success: false, message: "User not found" });
-            }
-
-            while (orbs < 0) {
-                newLives -= 1;
             }
             
             if (rankOrbs > newRankOrbs) {
@@ -100,6 +102,12 @@ var services = function(app) {
                 newLives += 1;
             }
 
+            if (lives == 0) {
+                newRankOrbs = 0;
+                newOrbs = 0;
+                newLives = 3;
+            }
+
             const playerData = {
                 'gameItems.orbs': newOrbs,
                 'gameItems.rankOrbs': newRankOrbs,
@@ -107,7 +115,7 @@ var services = function(app) {
             };
 
             const result = await coll.updateOne(
-                { username },
+                { username: username },
                 { $set: playerData }
             );
 

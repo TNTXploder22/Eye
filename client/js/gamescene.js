@@ -111,6 +111,7 @@ class GameScene extends Phaser.Scene {
         orbs = this.physics.add.group({ key: 'orb', repeat: 24, setXY: { x: 50, y: 0, stepX: 95 } });
         orbs.children.iterate(function (child) {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            child.setSize(20, 50)
         });
 
         scoreText = this.add.text(16, 16, 'Orbs: 0', { fontSize: '32px', fill: '#FF0000' }).setScrollFactor(0);
@@ -128,10 +129,10 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
         this.physics.add.overlap(player, winSpot, this.winGame, null, this);
 
-        checkpoint = this.physics.add.staticImage(100, 100, 'checkpoint');
+        checkpoint = this.physics.add.staticImage(1400, 495, 'ccheckpoint').setScale(1.5);
         checkpoint.setSize(50, 50);
 
-        killBrick = this.physics.add.staticImage(1600, 500, 'killbrick').setScale(0.5).setInteractive();
+        killBrick = this.physics.add.staticImage(1400, 600, 'killbrick').setScale(0.5).setInteractive();
         this.physics.world.enable(killBrick);
 
         this.physics.add.overlap(player, checkpoint, this.saveCheckpoint, null, this);
@@ -192,7 +193,7 @@ class GameScene extends Phaser.Scene {
 
     saveCheckpoint(player, checkpoint) {
         lastCheckpoint = { x: player.x, y: player.y };
-        console.log('Checkpoint saved at:', lastCheckpoint);
+        //console.log('Checkpoint saved at:', lastCheckpoint);
     }
 
     async updatePlayerLives() {
@@ -201,8 +202,13 @@ class GameScene extends Phaser.Scene {
         console.log('after player dies: ' + playerLives);
         console.log('Last checkpoint:', lastCheckpoint);
 
+        this.score = 0;
+        scoreText.setText('Orbs: ' + this.score);
+
+        this.updatePlayerData();
+
         if (playerLives <= 0) {
-            await this.updatePlayerData();
+            this.updatePlayerData();
             this.scene.start('deathscene');
         } else {
             if (lastCheckpoint) {
@@ -212,7 +218,6 @@ class GameScene extends Phaser.Scene {
                 player.setPosition(200, 450);
                 console.log('Respawned at starting position');
             }
-            await this.updatePlayerData();
         }
     }
 
@@ -251,7 +256,7 @@ class GameScene extends Phaser.Scene {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                username,
+                username: username,
                 orbs: this.score,
                 score: this.score,
                 rankOrbs: rankOrbs,
