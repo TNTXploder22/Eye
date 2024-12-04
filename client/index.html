@@ -1,125 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Phaser - Eye</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
-    <link rel="stylesheet" href="/client/css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/client/css/styles.css" />
+  </head>
+  <body>
     <div class="container">
-        <div id="signin-section">
-            <h1>Sign In</h1>
-            <form id="signin-form" onsubmit="return signIn(event)">
-                <label for="signin-username">Username</label>
-                <input type="text" id="signin-username" name="username" required>
+      <div id="signin-section">
+        <h1>Sign In</h1>
+        <form id="signin-form" onsubmit="return signIn(event)">
+          <label for="signin-username">Username</label>
+          <input type="text" id="signin-username" name="username" required />
 
-                <label for="signin-password">Password</label>
-                <input type="password" id="signin-password" name="password" required>
+          <label for="signin-password">Password</label>
+          <input
+            type="password"
+            id="signin-password"
+            name="password"
+            required
+          />
 
-                <button type="submit">Sign In</button>
-            </form>
-            <p>Don't have an account? <a href="javascript:void(0)" onclick="showSignUp(event)">Sign Up</a></p>
-        </div>
+          <button type="submit">Sign In</button>
+        </form>
+        <p>
+          Don't have an account?
+          <a href="javascript:void(0)" onclick="showSignUp(event)">Sign Up</a>
+        </p>
+      </div>
 
-        <div id="signup-section" style="display: none;">
-            <h1>Sign Up</h1>
-            <form id="signup-form" onsubmit="return signUp(event)">
-                <label for="signup-username">Username</label>
-                <input type="text" id="signup-username" name="username" required>
+      <div id="signup-section" style="display: none">
+        <h1>Sign Up</h1>
+        <form id="signup-form" onsubmit="return signUp(event)">
+          <label for="signup-username">Username</label>
+          <input type="text" id="signup-username" name="username" required />
 
-                <label for="signup-email">Email</label>
-                <input type="email" id="signup-email" name="email" required>
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="email" required />
 
-                <label for="signup-password">Password</label>
-                <input type="password" id="signup-password" name="password" required>
+          <label for="signup-password">Password</label>
+          <input
+            type="password"
+            id="signup-password"
+            name="password"
+            required
+          />
 
-                <button type="submit">Sign Up</button>
-            </form>
-            <p>Already have an account? <a href="javascript:void(0)" onclick="showSignIn(event)">Sign In</a></p>
-        </div>
+          <button type="submit">Sign Up</button>
+        </form>
+        <p>
+          Already have an account?
+          <a href="javascript:void(0)" onclick="showSignIn(event)">Sign In</a>
+        </p>
+      </div>
     </div>
 
-    <div id="game-container" style="display: none;"> 
-    </div>
+    <div id="game-container" style="display: none"></div>
 
     <script>
-        let game;
+      let game;
 
-        function showSignUp(event) {
-            event.preventDefault();
-            document.getElementById('signin-section').style.display = 'none';
-            document.getElementById('signup-section').style.display = 'block';
+      function showSignUp(event) {
+        event.preventDefault();
+        document.getElementById("signin-section").style.display = "none";
+        document.getElementById("signup-section").style.display = "block";
+      }
+
+      function showSignIn(event) {
+        event.preventDefault();
+        document.getElementById("signup-section").style.display = "none";
+        document.getElementById("signin-section").style.display = "block";
+      }
+
+      async function signIn(event) {
+        event.preventDefault();
+        const username = document.getElementById("signin-username").value;
+        const password = document.getElementById("signin-password").value;
+
+        const response = await fetch("/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const { username, email, gameItems } = data.user;
+
+          window.userData = { username, email, ...gameItems };
+
+          document.querySelector(".container").style.display = "none";
+          document.getElementById("game-container").style.display = "block";
+          startGame();
+        } else {
+          const errorData = await response.json();
+          alert(errorData.msg);
         }
+      }
 
-        function showSignIn(event) {
-            event.preventDefault();
-            document.getElementById('signup-section').style.display = 'none';
-            document.getElementById('signin-section').style.display = 'block';
+      async function signUp(event) {
+        event.preventDefault();
+        const username = document.getElementById("signup-username").value;
+        const email = document.getElementById("signup-email").value;
+        const password = document.getElementById("signup-password").value;
+
+        const response = await fetch("/write-data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, email, password }),
+        });
+
+        if (response.ok) {
+          alert("Sign-up successful!.");
+          showSignIn(event);
+        } else {
+          const errorData = await response.json();
+          alert(errorData.msg);
         }
+      }
 
-        async function signIn(event) {
-            event.preventDefault();
-            const username = document.getElementById('signin-username').value;
-            const password = document.getElementById('signin-password').value;
-
-            const response = await fetch('/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                const { username, email, gameItems } = data.user;
-
-                window.userData = { username, email, ...gameItems };
-
-                document.querySelector('.container').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-                startGame();
-            } else {
-                const errorData = await response.json();
-                alert(errorData.msg);
-            }
-        }
-
-        async function signUp(event) {
-            event.preventDefault();
-            const username = document.getElementById('signup-username').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-
-            const response = await fetch('/write-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, email, password })
-            });
-
-            if (response.ok) {
-                alert('Sign-up successful! You can now sign in.');
-                showSignIn(event);
-            } else {
-                const errorData = await response.json();
-                alert(errorData.msg);
-            }
-        }
-
-        function startGame() {
-            import('../client/js/game.js').then(module => {
-                game = new module.default();
-                game.userData = window.userData;
-                document.getElementById('game-container').appendChild(game.game.canvas);
-            }).catch(err => {
-                console.error('Failed to load game module:', err);
-            });
-        }
+      function startGame() {
+        import("../client/js/game.js")
+          .then((module) => {
+            game = new module.default();
+            game.userData = window.userData;
+            document
+              .getElementById("game-container")
+              .appendChild(game.game.canvas);
+          })
+          .catch((err) => {
+            console.error("Failed to load game module:", err);
+          });
+      }
     </script>
-</body>
+  </body>
 </html>
