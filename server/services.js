@@ -78,7 +78,7 @@ var services = function(app) {
             return res.status(400).send({ success: false, message: "Missing required fields" });
         }
 
-        console.log('banana')
+        console.log('Reached Database!');
 
         try {
             const db = await connectDB();

@@ -32,7 +32,10 @@ class LoadingScene extends Phaser.Scene {
             { type: 'image', key: 'clife', path: 'client/assets/clife.png' },
             { type: 'image', key: 'ccheckpoint', path: 'client/assets/ccheckpoint.png' },
             { type: 'image', key: 'killbrick', path: 'client/assets/killbrick.png' },
-            { type: 'spritesheet', key: 'eye', path: 'client/assets/eye.png', frameWidth: 88, frameHeight: 105 }
+            { type: 'spritesheet', key: 'eye', path: 'client/assets/eye.png', frameWidth: 88, frameHeight: 105 },
+            { type: 'spritesheet', key: 'slime', path: 'client/assets/slime.png', frameWidth: 88, frameHeight: 105 },
+            { type: 'spritesheet', key: 'lacus', path: 'client/assets/lacus.png', frameWidth: 88.5, frameHeight: 105 },
+            { type: 'spritesheet', key: 'eyeswing', path: 'client/assets/eyeswing.png', frameWidth: 88, frameHeight: 105 }
         ];
 
         this.loadAssetsGradually(assets);

@@ -1,4 +1,6 @@
 var player;
+var lacus;
+var slime;
 var platforms;
 var cursors;
 var orbs;
@@ -13,6 +15,7 @@ var playerLives = 3;
 var lastCheckpoint = null;
 var checkpoint;
 var killBrick;
+var touch = 0;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -93,6 +96,20 @@ class GameScene extends Phaser.Scene {
         player.setCollideWorldBounds(true);
         player.setSize(30, 100, 50, 0);
 
+        lacus = this.physics.add.sprite(300, 450, 'lacus').setScale(.75);
+        lacus.setBounce(0.2);
+        lacus.setCollideWorldBounds(true);
+        lacus.setSize(30, 100, 50, 0);
+        lacus.direction = 1;
+        lacus.speed = 40;
+
+        slime = this.physics.add.sprite(330, 450, 'slime').setScale(.75);
+        slime.setBounce(0.2);
+        slime.setCollideWorldBounds(true);
+        slime.setSize(30, 100, 50, 0);
+        slime.direction = 1;
+        slime.speed = 60;
+
         this.tweens.add({
             targets: winSpot,
             alpha: 1,
@@ -105,6 +122,14 @@ class GameScene extends Phaser.Scene {
         this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('eye', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
         this.anims.create({ key: 'turn', frames: [{ key: 'eye', frame: 4 }], frameRate: 20 });
         this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('eye', { start: 5, end: 8 }), frameRate: 10, repeat: -1 });
+
+        this.anims.create({ key: 'leftl', frames: this.anims.generateFrameNumbers('lacus', { start: 0, end: 3 }), frameRate: 5, repeat: -1 });
+        this.anims.create({ key: 'turnl', frames: [{ key: 'lacus', frame: 4 }], frameRate: 10 });
+        this.anims.create({ key: 'rightl', frames: this.anims.generateFrameNumbers('lacus', { start: 5, end: 8 }), frameRate: 5, repeat: -1 });
+
+        this.anims.create({ key: 'lefts', frames: this.anims.generateFrameNumbers('slime', { start: 0, end: 3 }), frameRate: 7, repeat: -1 });
+        this.anims.create({ key: 'turns', frames: [{ key: 'slime', frame: 4 }], frameRate: 10 });
+        this.anims.create({ key: 'rights', frames: this.anims.generateFrameNumbers('slime', { start: 5, end: 8 }), frameRate: 7, repeat: -1 });
 
         cursors = this.input.keyboard.createCursorKeys();
 
@@ -124,6 +149,13 @@ class GameScene extends Phaser.Scene {
         pausebutton.on('pointerdown', this.togglePause, this);
 
         this.physics.add.collider(player, platforms);
+        this.physics.add.collider(lacus, platforms);
+        this.physics.add.collider(slime, platforms);
+        this.physics.add.overlap(player, lacus, this.handleMonsterCollision, null, this);
+        this.physics.add.overlap(player, slime, this.handleMonsterCollision, null, this);
+
+        this.isImmuneToMonsters = false;
+
         this.physics.add.collider(orbs, platforms);
         this.physics.add.collider(winSpot, platforms);
         this.physics.add.overlap(player, orbs, this.collectOrbs, null, this);
@@ -144,6 +176,19 @@ class GameScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-P', this.togglePause, this);
         this.physics.world.setBounds(0, 0, 2400, 600);
+
+        this.time.addEvent({
+            delay: 3000,
+            callback: this.changeDirectionSlime,
+            callbackScope: this,
+            loop: true
+        });
+        this.time.addEvent({
+            delay: 5000,
+            callback: this.changeDirectionLacus,
+            callbackScope: this,
+            loop: true
+        });
     }
 
     update() {
@@ -164,7 +209,59 @@ class GameScene extends Phaser.Scene {
             player.setVelocityY(-330);
         }
 
+        this.moveMonsters(lacus);
+        this.moveMonsters(slime);
+
         livesText.setText(`Lives: ${playerLives}`);
+    }
+
+    moveMonsters(monster) {
+        if (monster.direction === 1) {
+            monster.setVelocityX(monster.speed);
+            if (!monster.anims.isPlaying || monster.anims.currentAnim.key !== `rightl` && monster.anims.currentAnim.key !== 'rights') {
+                monster.anims.play(monster.texture.key === 'lacus' ? 'rightl' : 'rights', true);
+            }
+        } else {
+            monster.setVelocityX(-monster.speed);
+            if (!monster.anims.isPlaying || monster.anims.currentAnim.key !== `leftl` && monster.anims.currentAnim.key !== 'lefts') {
+                monster.anims.play(monster.texture.key === 'lacus' ? 'leftl' : 'lefts', true);
+            }
+        }
+    }
+
+    changeDirectionSlime() {
+        if (slime.direction === 1) {
+            slime.direction = -1;
+        } else {
+            slime.direction = 1;
+        }
+    }
+    changeDirectionLacus() {
+        if (lacus.direction === 1) {
+            lacus.direction = -1;
+        } else {
+            lacus.direction = 1;
+        }
+    }
+
+    handleMonsterCollision(player) {
+        if (this.isImmuneToMonsters) return;
+        player.setTint(0xff0000);
+        this.isImmuneToMonsters = true;
+        touch += 1;
+        console.log(touch);
+
+        this.time.delayedCall(2000, () => {
+            player.clearTint();
+            this.isImmuneToMonsters = false;
+        });
+
+        if (touch == 2){
+            console.log('Player Touched Lacus/Slime Two Times -1 Life!');
+            player.clearTint();
+            touch = 0;
+            this.updatePlayerLives();
+        }
     }
 
     collectOrbs(player, orb) {
@@ -176,6 +273,8 @@ class GameScene extends Phaser.Scene {
     winGame() {
         winSpot.disableBody(true, true);
         console.log('Score before transitioning to win scene:', this.score);
+        touch = 0;
+        lastCheckpoint = null;
         this.updatePlayerData();
         this.scene.start('winscene', { score: this.score });
     }
@@ -193,7 +292,6 @@ class GameScene extends Phaser.Scene {
 
     saveCheckpoint(player, checkpoint) {
         lastCheckpoint = { x: player.x, y: player.y };
-        //console.log('Checkpoint saved at:', lastCheckpoint);
     }
 
     async updatePlayerLives() {
