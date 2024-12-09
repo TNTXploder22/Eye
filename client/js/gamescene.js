@@ -16,15 +16,20 @@ var lastCheckpoint = null;
 var checkpoint;
 var killBrick;
 var touch = 0;
+var eyeswing;
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "gamescene" });
     this.score = 0;
+    this.swingCooldown = false;
+    this.isSwinging = false;
   }
 
   async init() {
     this.score = 0;
+    this.swingCooldown = false;
+    this.isSwinging = false;
 
     try {
       const username = window.userData?.username;
@@ -106,12 +111,34 @@ class GameScene extends Phaser.Scene {
     lacus.direction = 1;
     lacus.speed = 40;
 
-    slime = this.physics.add.sprite(330, 450, "slime").setScale(0.75);
+    slime = this.physics.add.sprite(600, 450, "slime").setScale(0.75);
     slime.setBounce(0.2);
     slime.setCollideWorldBounds(true);
     slime.setSize(30, 100, 50, 0);
     slime.direction = 1;
     slime.speed = 60;
+
+    eyeswing = this.physics.add.sprite(player.x, player.y, "eyeswing").setScale(0.75)
+      .setOrigin(0.5)
+      .setAlpha(0)
+      .setBounce(0.2)
+      .setSize(player.width, player.height)
+      .setCollideWorldBounds(true)
+      .setGravity(0);
+
+    this.anims.create({
+        key: "eyeswing_left",
+        frames: this.anims.generateFrameNumbers("eyeswing", { start: 3, end: 0 }),
+        frameRate: 10,
+        repeat: 0,
+      });
+  
+      this.anims.create({
+        key: "eyeswing_right",
+        frames: this.anims.generateFrameNumbers("eyeswing", { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: 0,
+      });
 
     this.tweens.add({
       targets: winSpot,
@@ -178,6 +205,8 @@ class GameScene extends Phaser.Scene {
 
     cursors = this.input.keyboard.createCursorKeys();
 
+    this.input.keyboard.on("keydown-S", this.eyeSwing, this);
+
     orbs = this.physics.add.group({
       key: "orb",
       repeat: 24,
@@ -218,6 +247,7 @@ class GameScene extends Phaser.Scene {
     pausebutton.on("pointerdown", this.togglePause, this);
 
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(eyeswing, platforms);
     this.physics.add.collider(lacus, platforms);
     this.physics.add.collider(slime, platforms);
     this.physics.add.overlap(
@@ -307,11 +337,57 @@ class GameScene extends Phaser.Scene {
       player.setVelocityY(-330);
     }
 
+    if (this.isSwinging) {
+        eyeswing.setPosition(player.x, player.y);
+    }
+
     this.moveMonsters(lacus);
     this.moveMonsters(slime);
 
     livesText.setText(`Lives: ${playerLives}`);
   }
+
+  eyeSwing(pointer) {
+    if (isPaused || this.swingCooldown || this.isSwinging) return;
+  
+    player.setAlpha(0);
+    this.isImmuneToMonsters = true;
+    eyeswing.setAlpha(1);
+    eyeswing.setPosition(player.x, player.y);
+  
+    this.isSwinging = true;
+  
+    if (player.anims.currentAnim.key === "left") {
+      eyeswing.anims.play("eyeswing_left", true);
+    } else if (player.anims.currentAnim.key === "right") {
+      eyeswing.anims.play("eyeswing_right", true);
+    }
+
+    this.physics.add.collider(eyeswing, platforms);
+    this.physics.add.collider(eyeswing, lacus, this.handleMonsterCollision, null, this);
+    this.physics.add.collider(eyeswing, slime, this.handleMonsterCollision, null, this);
+
+    this.physics.add.overlap(eyeswing, lacus, this.destroyMonster, null, this);
+    this.physics.add.overlap(eyeswing, slime, this.destroyMonster, null, this);
+
+    this.time.delayedCall(400, () => {
+      player.setAlpha(1);
+      eyeswing.setAlpha(0);
+      this.isSwinging = false;
+    });
+
+    this.time.delayedCall(600, () => {
+      this.isImmuneToMonsters = false;
+    });
+  }
+
+  destroyMonster(eyeswing, monster) {
+    if (this.isSwinging) {
+      monster.setVisible(false);
+      monster.setActive(false);
+      monster.body.setEnable(false);
+    }
+  }  
 
   moveMonsters(monster) {
     if (monster.direction === 1) {
@@ -325,6 +401,8 @@ class GameScene extends Phaser.Scene {
           monster.texture.key === "lacus" ? "rightl" : "rights",
           true
         );
+      } {
+        slime.setFlipX(false);
       }
     } else {
       monster.setVelocityX(-monster.speed);
@@ -337,6 +415,8 @@ class GameScene extends Phaser.Scene {
           monster.texture.key === "lacus" ? "leftl" : "lefts",
           true
         );
+      } {
+      slime.setFlipX(true);
       }
     }
   }
