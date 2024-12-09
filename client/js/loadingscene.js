@@ -70,6 +70,11 @@ class LoadingScene extends Phaser.Scene {
         frameWidth: 88,
         frameHeight: 105,
       },
+      {
+        type: "audio",
+        key: "christmasmusic",
+        path: "client/assets/christmasmusic.mp3",
+      },
     ];
 
     this.loadAssetsGradually(assets);
@@ -89,6 +94,8 @@ class LoadingScene extends Phaser.Scene {
             frameWidth: asset.frameWidth,
             frameHeight: asset.frameHeight,
           });
+        } else if (asset.type === "audio") {
+          this.load.audio(asset.key, asset.path);
         }
 
         this.loadingText.setText(`Loading: ${asset.key}`);
@@ -97,6 +104,7 @@ class LoadingScene extends Phaser.Scene {
         this.time.delayedCall(assetDelay, loadNextAsset, [], this);
       } else {
         this.load.on("complete", () => {
+          this.playMusic();
           this.scene.start("titlescene");
         });
         this.load.start();
@@ -106,7 +114,11 @@ class LoadingScene extends Phaser.Scene {
     loadNextAsset();
   }
 
-  create() {}
+  playMusic() {
+    const music = this.sound.add("christmasmusic");
+    music.setLoop(true);
+    music.play();
+  }
 }
 
 export default LoadingScene;
