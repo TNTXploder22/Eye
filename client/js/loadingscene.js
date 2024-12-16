@@ -30,6 +30,10 @@ class LoadingScene extends Phaser.Scene {
       { type: "image", key: "shader", path: "client/assets/cover.png" },
       { type: "image", key: "eyetitle", path: "client/assets/ceyetitle.png" },
       { type: "image", key: "playtitle", path: "client/assets/cplaytitle.png" },
+      { type: "image", key: "restart", path: "client/assets/restart.png" },
+      { type: "image", key: "gameover", path: "client/assets/gameover.png" },
+      { type: "image", key: "youlose", path: "client/assets/youlose.png" },
+      { type: "image", key: "text", path: "client/assets/text.png" },
       {
         type: "image",
         key: "arrowtitle",
